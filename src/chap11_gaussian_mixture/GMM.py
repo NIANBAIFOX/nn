@@ -7,16 +7,21 @@ def generate_data(n_samples=1000):
     # 真实参数
     # 定义三个高斯分布的均值(中心点)
     mu_true = np.array([ 
-        [0, 0],  # 第一个高斯分布的均值
-        [5, 5],  # 第二个高斯分布的均值
-        [-5, 5]  # 第三个高斯分布的均值
+        # 第一个高斯分布的均值
+        [0, 0],  
+        # 第二个高斯分布的均值
+        [5, 5],  
+        # 第三个高斯分布的均值
+        [-5, 5]  
     ])
     # 定义三个高斯分布的协方差矩阵
     sigma_true = np.array([
-        [[1, 0], [0, 1]],  # 第一个分布：圆形分布(各向同性)
-        [[2, 0.5], [0.5, 1]],   # 第二个分布：倾斜的椭圆
-        [[1, -0.5], [-0.5, 2]]
+        # 第一个分布：圆形分布(各向同性)
+        [[1, 0], [0, 1]],
+        # 第二个分布：倾斜的椭圆
+        [[2, 0.5], [0.5, 1]],
         # 第三个分布：反向倾斜的椭圆
+        [[1, -0.5], [-0.5, 2]]
     ])
     # 定义每个高斯分布的混合权重(必须和为1)
     weights_true = np.array([0.3, 0.4, 0.3])
@@ -33,11 +38,15 @@ def generate_data(n_samples=1000):
         y_true.extend([i] * samples_per_component[i])  # 添加对应标签
     
     # 合并并打乱数据
-    X = np.vstack(X_list)  #将多个子数据集合并为一个完整数据集
-    y_true = np.array(y_true)  #将Python列表转换为NumPy数组
-    shuffle_idx = np.random.permutation(n_samples) #生成0到n_samples-1的随机排列
-    return X[shuffle_idx], y_true[shuffle_idx] #使用相同的随机索引同时打乱特征和标签
-
+    #将多个子数据集合并为一个完整数据集
+    X = np.vstack(X_list) 
+    #将Python列表转换为NumPy数组
+    y_true = np.array(y_true)  
+    #生成0到n_samples-1的随机排列
+    shuffle_idx = np.random.permutation(n_samples) 
+    #使用相同的随机索引同时打乱特征和标签
+    return X[shuffle_idx], y_true[shuffle_idx] 
+    
 # 自定义logsumexp函数
 def logsumexp(log_p, axis=1, keepdims=False):
     #max_val = np.max(log_p, axis=axis, keepdims=True)
@@ -46,13 +55,18 @@ def logsumexp(log_p, axis=1, keepdims=False):
     log_p = np.asarray(log_p)
     
     # 处理空输入情况
-    if log_p.size == 0:  # 检查输入的对数概率数组是否为空
-        return np.array(-np.inf, dtype=log_p.dtype)  # 返回与输入相同数据类型的负无穷值
+    # 检查输入的对数概率数组是否为空
+    if log_p.size == 0: 
+        # 返回与输入相同数据类型的负无穷值
+        return np.array(-np.inf, dtype=log_p.dtype)  
     
     # 计算最大值（处理全-inf输入）
-    max_val = np.max(log_p, axis=axis, keepdims=True)  # 计算沿指定轴的最大值
-    if np.all(np.isneginf(max_val)):  # 检查是否所有最大值都是负无穷
-        return max_val.copy() if keepdims else max_val.squeeze(axis=axis)  # 根据keepdims返回适当形式
+    # 计算沿指定轴的最大值
+    max_val = np.max(log_p, axis=axis, keepdims=True) 
+    # 检查是否所有最大值都是负无穷
+    if np.all(np.isneginf(max_val)):  
+        # 根据keepdims返回适当形式
+        return max_val.copy() if keepdims else max_val.squeeze(axis=axis)  
     
     # 计算修正后的指数和（处理-inf输入）
     safe_log_p = np.where(np.isneginf(log_p), -np.inf, log_p - max_val)  # 安全调整对数概率
